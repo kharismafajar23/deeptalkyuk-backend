@@ -41,6 +41,10 @@ class UserController extends Controller
                 throw new Exception('Invalid Password');
             }
 
+            if ($user->is_active == 0) {
+                throw new Exception('Akun Anda belum aktif, silahkan hubungi administrator terlebih dahulu');
+            }
+
             $tokenResult = $user->createToken('authToken')->plainTextToken;
 
             return ResponseFormatter::success([
@@ -49,7 +53,7 @@ class UserController extends Controller
                 'user' => $user
             ], 'Login Success');
         } catch (Exception $e) {
-            return ResponseFormatter::error('Authentication Failed');
+            return ResponseFormatter::error($e->getMessage(), 500);
         }
     }
 
@@ -65,7 +69,8 @@ class UserController extends Controller
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make($request->password)
+                'password' => Hash::make($request->password),
+                'is_active' => false
             ]);
 
             $tokenResult = $user->createToken('authToken')->plainTextToken;
