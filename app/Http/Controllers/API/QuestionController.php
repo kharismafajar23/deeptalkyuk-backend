@@ -18,6 +18,7 @@ class QuestionController extends Controller
         $title = $request->input('title');
         $status = $request->input('status');
         $question_category_id = $request->input('question_category_id');
+        $rank = $request->input('rank', false);
         $limit = $request->input('limit', 10);
 
         $questionQuery = Question::query();
@@ -44,6 +45,10 @@ class QuestionController extends Controller
 
         if ($question_category_id) {
             $questionQuery->where('question_category_id', $question_category_id);
+        }
+
+        if ($rank) {
+            $questionQuery->orderBy('amount_appear', 'desc');
         }
 
         return ResponseFormatter::success(
